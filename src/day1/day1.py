@@ -16,4 +16,6 @@ with p.open("r") as f:
             current_elf += 1
             elves.append(0)
 
-    print(max(elves))
+    elves.sort(reverse=True)
+    print("Top:", elves[0])
+    print("Top 3:", sum(elves[:3]))
