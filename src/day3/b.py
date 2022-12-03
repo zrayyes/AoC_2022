@@ -22,5 +22,4 @@ with p.open("r") as f:
         score += sum(set(first).intersection(set(second).intersection(third)))
 
     print(score)
-
-# 2821
+    assert score == 2821
