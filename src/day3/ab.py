@@ -2,16 +2,10 @@ from pathlib import Path
 
 p = Path(__file__).with_name("input.txt")
 with p.open("r") as f:
-    all_backpacks = []
-
-    for line in f.read().split("\n"):
-        backpack = []
-        for item in list(line):
-            if ord(item) >= ord("a"):
-                backpack.append(ord(item) - ord("a") + 1)
-            else:
-                backpack.append(ord(item) - ord("A") + 27)
-        all_backpacks.append(backpack)
+    all_backpacks = [
+        [ord(item) - 96 if ord(item) >= 96 else ord(item) - 38 for item in list(line)]
+        for line in f.read().split("\n")
+    ]
 
     score_A = 0
 
