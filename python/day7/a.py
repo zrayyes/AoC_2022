@@ -1,6 +1,7 @@
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
+import sys
 from typing import List, Optional
 
 
@@ -49,6 +50,18 @@ class Node:
 
         return out
 
+    def get_all_child_nodes(self) -> List["Node"]:
+        if not self.is_dir:
+            return [self]
+        
+        out = []
+        for c in self.children:
+            out = out + [c] + c.get_all_child_nodes()
+
+        return out
+
+
+max_length = int(sys.argv[1]) if len(sys.argv) > 1 else 100000
 
 p = Path(__file__).with_name("input.txt")
 root_node = Node("/", True, 0, None, [])
@@ -94,3 +107,5 @@ with p.open() as f:
             current_node.children.append(new_node)
 
 print(root_node)
+nodes_with_max_length = [n.size for n in root_node.get_all_child_nodes() if n.is_dir and n.size < max_length]
+print(sum(nodes_with_max_length))
