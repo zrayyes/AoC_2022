@@ -40,8 +40,9 @@ class Node:
 
     def __str__(self) -> str:
         prefix = "  " * self.depth
+        emoji = "📂" if self.is_dir else "📄"
         node_type = "dir" if self.is_dir else "file"
-        out = f"{prefix}- {self.name} ({node_type}, {self.size})"
+        out = f"{prefix}- {emoji} {self.name} ({node_type}, {self.size})"
         for child in self.children:
             out = out + "\n"
             out = out + str(child)
