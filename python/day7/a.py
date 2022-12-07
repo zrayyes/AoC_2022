@@ -53,7 +53,7 @@ class Node:
     def get_all_child_nodes(self) -> List["Node"]:
         if not self.is_dir:
             return [self]
-        
+
         out = []
         for c in self.children:
             out = out + [c] + c.get_all_child_nodes()
@@ -106,6 +106,28 @@ with p.open() as f:
             new_node = Node(file_name, is_dir, size, current_node, [])
             current_node.children.append(new_node)
 
+total_size = root_node.size
+free_space_left = 70000000 - root_node.size
+space_needed = 30000000 - free_space_left
+
+nodes_with_max_length = [
+    n.size for n in root_node.get_all_child_nodes() if n.is_dir and n.size < max_length
+]
+
+smallest_deletable = sorted(
+    [n for n in root_node.get_all_child_nodes() if n.is_dir and n.size > space_needed],
+    key=lambda x: x.size,
+)[0]
+
 print(root_node)
-nodes_with_max_length = [n.size for n in root_node.get_all_child_nodes() if n.is_dir and n.size < max_length]
-print(sum(nodes_with_max_length))
+print()
+print(f"Total size: {root_node.size}")
+print(f"Free size: {free_space_left}")
+print(f"Space needed: {space_needed}")
+print()
+print(f"Sum of dirs smaller than {max_length}: {sum(nodes_with_max_length)}")
+print(f"Size of smallest directory to delete: {smallest_deletable.size}")
+
+
+# 1118405
+#
