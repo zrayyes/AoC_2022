@@ -15,15 +15,23 @@ class Grid:
         self.width = len(input[0])
 
     def get_left_trees(self, y: int, x: int) -> List[int]:
+        if x == 0:
+            return [-1]
         return list(reversed(self.grid[y][:x]))
 
     def get_right_trees(self, y: int, x: int) -> List[int]:
+        if x == self.width - 1:
+            return [-1]
         return self.grid[y][x + 1 :]
 
     def get_top_trees(self, y: int, x: int) -> List[int]:
+        if y == 0:
+            return [-1]
         return list(reversed([self.grid[v][x] for v in range(y)]))
 
     def get_bottom_trees(self, y: int, x: int) -> List[int]:
+        if y == self.height - 1:
+            return [-1]
         return [self.grid[v][x] for v in range(y + 1, self.height)]
 
     def walk(self) -> List[bool]:
@@ -31,22 +39,18 @@ class Grid:
         for y in range(self.height):
             for x in range(self.width):
                 tree = self.grid[y][x]
-                # if tree on edge
-                if y == 0 or x == 0 or x == self.height - 1 or y == self.width - 1:
+                # Left
+                if tree > max(self.get_left_trees(y, x)):
                     out.append(True)
-                else:
-                    # Left
-                    if tree > max(self.get_left_trees(y, x)):
-                        out.append(True)
-                    # Right
-                    elif tree > max(self.get_right_trees(y, x)):
-                        out.append(True)
-                    # Top
-                    elif tree > max(self.get_top_trees(y, x)):
-                        out.append(True)
-                    # Bottom
-                    elif tree > max(self.get_bottom_trees(y, x)):
-                        out.append(True)
+                # Right
+                elif tree > max(self.get_right_trees(y, x)):
+                    out.append(True)
+                # Top
+                elif tree > max(self.get_top_trees(y, x)):
+                    out.append(True)
+                # Bottom
+                elif tree > max(self.get_bottom_trees(y, x)):
+                    out.append(True)
 
         return out
 
@@ -55,41 +59,37 @@ class Grid:
         for y in range(self.height):
             for x in range(self.width):
                 tree = self.grid[y][x]
-                # if tree on edge
-                if y == 0 or x == 0 or x == self.height - 1 or y == self.width - 1:
-                    out.append(0)
-                else:
-                    counter = 1
-                    # Left
-                    left_counter = 0
-                    for left_tree in self.get_left_trees(y, x):
-                        left_counter += 1
-                        if tree <= left_tree:
-                            break
-                    counter *= left_counter
-                    # Right
-                    right_counter = 0
-                    for right_tree in self.get_right_trees(y, x):
-                        right_counter += 1
-                        if tree <= right_tree:
-                            break
-                    counter *= right_counter
-                    # Top
-                    top_counter = 0
-                    for top_tree in self.get_top_trees(y, x):
-                        top_counter += 1
-                        if tree <= top_tree:
-                            break
-                    counter *= top_counter
-                    # Bottom
-                    bot_counter = 0
-                    for bot_tree in self.get_bottom_trees(y, x):
-                        bot_counter += 1
-                        if tree <= bot_tree:
-                            break
-                    counter *= bot_counter
+                counter = 1
+                # Left
+                left_counter = 0
+                for left_tree in self.get_left_trees(y, x):
+                    left_counter += 1
+                    if tree <= left_tree:
+                        break
+                counter *= left_counter
+                # Right
+                right_counter = 0
+                for right_tree in self.get_right_trees(y, x):
+                    right_counter += 1
+                    if tree <= right_tree:
+                        break
+                counter *= right_counter
+                # Top
+                top_counter = 0
+                for top_tree in self.get_top_trees(y, x):
+                    top_counter += 1
+                    if tree <= top_tree:
+                        break
+                counter *= top_counter
+                # Bottom
+                bot_counter = 0
+                for bot_tree in self.get_bottom_trees(y, x):
+                    bot_counter += 1
+                    if tree <= bot_tree:
+                        break
+                counter *= bot_counter
 
-                    out.append(counter)
+                out.append(counter)
 
         return out
 
