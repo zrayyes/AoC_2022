@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 
 p = Path(__file__).with_name("input.txt")
 
@@ -34,55 +34,49 @@ class Grid:
             return [-1]
         return [self.grid[v][x] for v in range(y + 1, self.height)]
 
+    def get_all_sides(self, x, y) -> List[List[int]]:
+        return [
+            self.get_left_trees(x, y),
+            self.get_right_trees(x, y),
+            self.get_top_trees(x, y),
+            self.get_bottom_trees(x, y),
+        ]
+
+    def get_scenic_score_and_visibility(
+        self, y: int, x: int, trees: List[int]
+    ) -> Tuple[int, bool]:
+        tree = self.grid[y][x]
+        scenic_score = 0
+        visible = True
+        for left_tree in trees:
+            if left_tree == -1:
+                break
+            scenic_score += 1
+            if tree <= left_tree:
+                visible = False
+                break
+        return (scenic_score, visible)
 
     def walk(self):
         scenic_scores = []
         visible_counter = 0
         for y in range(self.height):
             for x in range(self.width):
-                tree = self.grid[y][x]
-                counter = 1
-                # Left
-                left_counter = 0
-                left_visible = True
-                for left_tree in self.get_left_trees(y, x):
-                    left_counter += 1
-                    if tree <= left_tree:
-                        left_visible = False
-                        break
-                counter *= left_counter
-                # Right
-                right_counter = 0
-                right_visible = True
-                for right_tree in self.get_right_trees(y, x):
-                    right_counter += 1
-                    if tree <= right_tree:
-                        right_visible = False
-                        break
-                counter *= right_counter
-                # Top
-                top_counter = 0
-                top_visible = True
-                for top_tree in self.get_top_trees(y, x):
-                    top_counter += 1
-                    if tree <= top_tree:
-                        top_visible = False
-                        break
-                counter *= top_counter
-                # Bottom
-                bot_counter = 0
-                bot_visible = True
-                for bot_tree in self.get_bottom_trees(y, x):
-                    bot_counter += 1
-                    if tree <= bot_tree:
-                        bot_visible = False
-                        break
-                counter *= bot_counter
+                scenic_score = 1
+                visible = False
 
-                scenic_scores.append(counter)
+                for side in self.get_all_sides(x, y):
+                    side_counter, side_visible = self.get_scenic_score_and_visibility(
+                        x, y, side
+                    )
+                    scenic_score *= side_counter
+                    visible = visible or side_visible
 
-                if left_visible or right_visible or top_visible or bot_visible:
+                scenic_scores.append(scenic_score)
+
+                if visible:
                     visible_counter += 1
+
         print(f"Trees Visible: {visible_counter}")
         print(f"Max Scenic Score: {max(scenic_scores)}")
 
