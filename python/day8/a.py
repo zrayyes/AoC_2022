@@ -34,64 +34,57 @@ class Grid:
             return [-1]
         return [self.grid[v][x] for v in range(y + 1, self.height)]
 
-    def walk(self) -> List[bool]:
-        out = []
-        for y in range(self.height):
-            for x in range(self.width):
-                tree = self.grid[y][x]
-                # Left
-                if tree > max(self.get_left_trees(y, x)):
-                    out.append(True)
-                # Right
-                elif tree > max(self.get_right_trees(y, x)):
-                    out.append(True)
-                # Top
-                elif tree > max(self.get_top_trees(y, x)):
-                    out.append(True)
-                # Bottom
-                elif tree > max(self.get_bottom_trees(y, x)):
-                    out.append(True)
 
-        return out
-
-    def walk_again(self) -> List[int]:
-        out = []
+    def walk(self):
+        scenic_scores = []
+        visible_counter = 0
         for y in range(self.height):
             for x in range(self.width):
                 tree = self.grid[y][x]
                 counter = 1
                 # Left
                 left_counter = 0
+                left_visible = True
                 for left_tree in self.get_left_trees(y, x):
                     left_counter += 1
                     if tree <= left_tree:
+                        left_visible = False
                         break
                 counter *= left_counter
                 # Right
                 right_counter = 0
+                right_visible = True
                 for right_tree in self.get_right_trees(y, x):
                     right_counter += 1
                     if tree <= right_tree:
+                        right_visible = False
                         break
                 counter *= right_counter
                 # Top
                 top_counter = 0
+                top_visible = True
                 for top_tree in self.get_top_trees(y, x):
                     top_counter += 1
                     if tree <= top_tree:
+                        top_visible = False
                         break
                 counter *= top_counter
                 # Bottom
                 bot_counter = 0
+                bot_visible = True
                 for bot_tree in self.get_bottom_trees(y, x):
                     bot_counter += 1
                     if tree <= bot_tree:
+                        bot_visible = False
                         break
                 counter *= bot_counter
 
-                out.append(counter)
+                scenic_scores.append(counter)
 
-        return out
+                if left_visible or right_visible or top_visible or bot_visible:
+                    visible_counter += 1
+        print(f"Trees Visible: {visible_counter}")
+        print(f"Max Scenic Score: {max(scenic_scores)}")
 
     def __str__(self) -> str:
         out = f"Width: {self.width}, Height: {self.height}\n"
@@ -103,9 +96,6 @@ with p.open() as f:
     grid = Grid(input)
     print(grid)
     visible = grid.walk()
-    print(len(visible))
-    scenic_score = grid.walk_again()
-    print(max(scenic_score))
 
 # 1787
 # 440640
