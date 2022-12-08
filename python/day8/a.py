@@ -27,7 +27,7 @@ class Grid:
                     if tree > max(self.grid[y][:x]):
                         out.append(True)
                     # Right
-                    elif tree > max(self.grid[y][x+1:]):
+                    elif tree > max(self.grid[y][x + 1 :]):
                         out.append(True)
                     # Top
                     elif tree > max([self.grid[v][x] for v in range(y)]):
@@ -37,6 +37,51 @@ class Grid:
                         [self.grid[v][x] for v in range(y + 1, self.height)]
                     ):
                         out.append(True)
+
+        return out
+
+    def walk_again(self) -> List[int]:
+        out = []
+        for y in range(self.height):
+            for x in range(self.width):
+                tree = self.grid[y][x]
+                # if tree on edge
+                if y == 0 or x == 0 or x == self.height - 1 or y == self.width - 1:
+                    out.append(0)
+                else:
+                    counter = 1
+                    # Left
+                    left_counter = 0
+                    for left_tree in reversed(self.grid[y][:x]):
+                        left_counter += 1
+                        if tree <= left_tree:
+                            break
+                    counter *= left_counter
+                    # Right
+                    right_counter = 0
+                    for right_tree in self.grid[y][x + 1 :]:
+                        right_counter += 1
+                        if tree <= right_tree:
+                            break
+                    counter *= right_counter
+                    # Top
+                    top_counter = 0
+                    for top_tree in reversed([self.grid[v][x] for v in range(y)]):
+                        top_counter += 1
+                        if tree <= top_tree:
+                            break
+                    counter *= top_counter
+                    # Bottom
+                    bot_counter = 0
+                    for bot_tree in [
+                        self.grid[v][x] for v in range(y + 1, self.height)
+                    ]:
+                        bot_counter += 1
+                        if tree <= bot_tree:
+                            break
+                    counter *= bot_counter
+
+                    out.append(counter)
 
         return out
 
@@ -51,6 +96,8 @@ with p.open() as f:
     print(grid)
     visible = grid.walk()
     print(len(visible))
-
+    scenic_score = grid.walk_again()
+    print(max(scenic_score))
 
 # 1787
+# 440640
