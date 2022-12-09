@@ -1,4 +1,5 @@
 from dataclasses import dataclass, replace
+from math import ceil
 from pathlib import Path
 from typing import List
 
@@ -12,19 +13,21 @@ class Point:
 class Grid:
     height: int
     width: int
-    start = Point(0, 0)
-    head = Point(0, 0)
+    start: Point
+    head: Point
     knots: List[Point] = []
     visited: set[Point] = set()
 
     def __init__(self, width: int, height: int, knots: int) -> None:
         self.width = width
         self.height = height
+        self.start = Point(ceil(self.width / 2), ceil(self.height / 2))
         self.visited.add(self.start)
+        self.head = self.start
 
         # 2 knots = head + 1 knot
         for i in range(knots - 1):
-            self.knots.append(Point(0, 0))
+            self.knots.append(self.start)
 
     def __str__(self) -> str:
         out = ""
@@ -34,7 +37,7 @@ class Grid:
                 if self.head == p:
                     out += "H"
                 elif p in self.knots:
-                    out += str(self.knots.index(p))
+                    out += str(self.knots.index(p) + 1)
                 elif self.start == p:
                     out += "s"
                 elif p in self.visited:
@@ -78,27 +81,30 @@ class Grid:
         return new_location
 
     def move_all_knots(self):
-        for i, knots in enumerate(self.knots):
+        for i, knot in enumerate(self.knots):
             head = self.head
-            if i > 1:
+            if i >= 1:
                 head = self.knots[i - 1]
-            tail = knots
+            tail = knot
             new_location = self.move_tail(head, tail)
             self.knots[i] = new_location
-            self.visited.add(new_location)
+            if i == len(self.knots) - 1:
+                self.visited.add(new_location)
 
 
 p = Path(__file__).with_name("input.txt")
 
 with p.open() as f:
-    grid = Grid(10, 10, 2)
+    grid = Grid(100, 100, 10)
     for line in f.read().split("\n"):
         direction, times = line.split(" ")
         times = int(times)
-        print(f"== {direction} {times} ==")
         for t in range(times):
             grid.move(direction)
             grid.move_all_knots()
 
     print(grid)
     print(len(grid.visited))
+
+# 5683
+# 2372
