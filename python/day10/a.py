@@ -8,6 +8,7 @@ with p.open() as f:
     x = 1
     current_cycle = 1
     sum_of_cycles = 0
+    crt = ""
     for line in lines:
         line = line.split(" ")
         command = line[0]
@@ -24,11 +25,23 @@ with p.open() as f:
                 signal_strength = x * current_cycle
                 print(f"Cycle {current_cycle}: {signal_strength}")
                 sum_of_cycles += signal_strength
+
+            CRT_pos = (current_cycle - 1) % 40
+            if CRT_pos == 0:
+                crt += "\n"
+
+            if x - 1 <= CRT_pos <= x + 1:
+                crt += "#"
+            else:
+                crt += " "
+
             current_cycle += 1
 
         if command == "addx":
             x += count
 
     print(f"Total Signal Strength: {sum_of_cycles}")
+    print(crt)
 
 # 13520
+# PGPHBEAB
