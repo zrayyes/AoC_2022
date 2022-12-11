@@ -1,3 +1,4 @@
+import copy
 from dataclasses import dataclass
 import math
 from pathlib import Path
@@ -15,12 +16,10 @@ class Monkey:
 
 
 class Tree:
-    monkeys: List[Monkey]
-    round_number: int
-
     def __init__(self) -> None:
-        self.monkeys = []
+        self.monkeys: List[Monkey] = []
         self.round_number = 0
+        self.devisor = 1
 
     def __str__(self) -> str:
         out = ""
@@ -31,6 +30,7 @@ class Tree:
 
     def add_monkey(self, monkey: Monkey):
         self.monkeys.append(monkey)
+        self.devisor *= monkey.test
 
     def throw_to_monkey(self, monkey_number: int, item: int):
         self.monkeys[monkey_number].items.append(item)
@@ -51,6 +51,8 @@ class Tree:
 
                 if no_worries:
                     new_item = new_item // 3
+                else:
+                    new_item = new_item % self.devisor
 
                 # Test
                 if new_item % monkey.test == 0:
@@ -63,7 +65,6 @@ class Tree:
 
 
 tree_1 = Tree()
-tree_2 = Tree()
 
 p = Path(__file__).with_name("input.txt")
 with p.open() as f:
@@ -82,18 +83,23 @@ with p.open() as f:
         test_true = int(lines[4][29:])
         test_false = int(lines[5][30:])
 
-        monkey = Monkey(starting_items, operation, test, test_true, test_false)
-        tree_1.add_monkey(monkey)
-        tree_2.add_monkey(monkey)
+        tree_1.add_monkey(
+            Monkey(starting_items, operation, test, test_true, test_false)
+        )
+
+tree_2 = copy.deepcopy(tree_1)
 
 # Part 1
 for i in range(20):
     tree_1.start_round()
 print(tree_1)
 print(tree_1.get_monkey_business())
+# 111210
 
 # Part 2
-# for i in range(10000):
-#     tree_2.start_round(no_worries=False)
-# print(tree_2)
-# print(tree_2.get_monkey_business())
+for i in range(10000):
+    tree_2.start_round(no_worries=False)
+print(tree_2)
+print(tree_2.get_monkey_business())
+
+# 15447387620
