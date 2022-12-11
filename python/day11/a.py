@@ -16,6 +16,9 @@ class Monkey:
 
 
 class Tree:
+    monkeys: List[Monkey]
+    round_number: int
+
     def __init__(self) -> None:
         self.monkeys: List[Monkey] = []
         self.round_number = 0
@@ -65,6 +68,7 @@ class Tree:
 
 
 tree_1 = Tree()
+tree_2 = Tree()
 
 p = Path(__file__).with_name("input.txt")
 with p.open() as f:
@@ -84,10 +88,12 @@ with p.open() as f:
         test_false = int(lines[5][30:])
 
         tree_1.add_monkey(
-            Monkey(starting_items, operation, test, test_true, test_false)
+            Monkey(copy.copy(starting_items), operation, test, test_true, test_false)
+        )
+        tree_2.add_monkey(
+            Monkey(copy.copy(starting_items), operation, test, test_true, test_false)
         )
 
-tree_2 = copy.deepcopy(tree_1)
 
 # Part 1
 for i in range(20):
