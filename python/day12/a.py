@@ -47,7 +47,7 @@ class Grid:
                 elif sq in visited:
                     out += "  V"
                 else:
-                    out += str(self.get_square(row_number, col_number).height).rjust(
+                    out += str(sq.height).rjust(
                         2, " "
                     )
                 out += " "
@@ -119,5 +119,8 @@ end = grid.get_square(end_coords[0], end_coords[1])
 grid.map_distance(end)
 
 print(start.distance_from_end)
-
 # 425
+
+least = min([sq.distance_from_end for row in grid.grid for sq in row if sq.height == 1 and sq.distance_from_end != -1])
+print(least)
+# 418
