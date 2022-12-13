@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Set
+from typing import List, Set, Tuple
 
 
 @dataclass(frozen=True, eq=True)
@@ -10,10 +10,48 @@ class Square:
     height: int
 
 
+class Grid:
+    height: int
+    width: int
+    grid: List[List[Square]]
+    starting_coords: Tuple[int, int]
+
+    def __init__(self, grid: List[List[Square]], starting_coords: Tuple[int, int]) -> None:
+        self.grid = grid
+        self.height = len(grid)
+        self.width = len(grid[0])
+        self.starting_coords = starting_coords
+
+    def get_square(self, row: int, col: int) -> Square:
+        return self.grid[row][col]
+
+    def __str__(self, visited: Set[Square] = set()) -> str:
+        out = ""
+
+        for row_number, _ in enumerate(self.grid):
+            for col_number, _ in enumerate(self.grid[row_number]):
+                sq = self.get_square(row_number, col_number)
+                if sq.height == E:
+                    out += " E"
+                elif sq.height == S:
+                    out += " S"
+                elif sq in visited:
+                    out += " V"
+                else:
+                    out += str(self.get_square(row_number, col_number).height).rjust(
+                        2, " "
+                    )
+                out += " "
+
+            out += "\n"
+
+        return out
+
+
 S = 0
 E = 27
 
-grid: List[List[Square]] = []
+all_squares: List[List[Square]] = []
 starting_coords = (0, 0)
 
 p = Path(__file__).with_name("input.txt")
@@ -31,63 +69,8 @@ with p.open() as f:
             s = Square(row_number, col_number, height)
             row.append(s)
 
-        grid.append(row)
+        all_squares.append(row)
 
+grid = Grid(all_squares, starting_coords)
 
-def find_next_square(s: Square, visited: Set[Square]) -> Set[Square]:
-    visited.add(s)
-    if s.height == E:
-        print(len(visited))
-        print("ONE PIECE")
-        return visited
-
-    all_sides = []
-    # Left
-    if s.col > 0:
-        sq = grid[s.row][s.col - 1]
-        if sq not in visited and 0 <= sq.height - s.height <= 1:
-            print("Going Left")
-            visited_left = find_next_square(sq, visited)
-            if len(visited_left) > 0:
-                all_sides.append(visited_left)
-    # Right
-    if s.col < len(grid[s.row]) - 1:
-        sq = grid[s.row][s.col + 1]
-        if sq not in visited and 0 <= sq.height - s.height <= 1:
-            print("Going Right")
-            visited_right = find_next_square(sq, visited)
-            if len(visited_right) > 0:
-                all_sides.append(visited_right)
-    # Top
-    if s.row > 0:
-        sq = grid[s.row - 1][s.col]
-        if sq not in visited and 0 <= sq.height - s.height <= 1:
-            print("Going Top")
-            visited_top = find_next_square(sq, visited)
-            if len(visited_top) > 0:
-                all_sides.append(visited_top)
-    # Bottom
-    if s.row < len(grid) - 1:
-        sq = grid[s.row + 1][s.col]
-        if sq not in visited and 0 <= sq.height - s.height <= 1:
-            print("Going Bottom")
-            visited_bottom = find_next_square(sq, visited)
-            if len(visited_bottom) > 0:
-                all_sides.append(visited_bottom)
-
-    # Pick shortest side
-    if all_sides:
-        shortest_side = all_sides[0]
-        print([len(side) for side in all_sides])
-        for side in all_sides:
-            if len(side) < len(shortest_side):
-                visited = side
-        return visited
-    else:
-        return set()
-
-
-current_square = grid[starting_coords[0]][starting_coords[1]]
-all_visited: Set[Square] = set()
-find_next_square(current_square, all_visited)
-print(len(all_visited))
+print(grid)
