@@ -1,27 +1,28 @@
 import copy
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional, Set, Tuple
+from typing import List, Optional, Set
 
 
-@dataclass(frozen=True, eq=True)
+@dataclass(unsafe_hash=True)
 class Square:
     row: int
     col: int
     height: int
+    distance_from_end: int = -1
 
 
 class Grid:
     height: int
     width: int
     grid: List[List[Square]]
-    distance: int
+    distance_to_end: int
 
     def __init__(self, grid: List[List[Square]]) -> None:
         self.grid = grid
         self.height = len(grid)
         self.width = len(grid[0])
-        self.distance = -1
+        self.distance_to_end = -1
 
     def __str__(self, visited: Set[Square] = set()) -> str:
         out = ""
@@ -68,18 +69,27 @@ class Grid:
 
         return out
 
+    def map_distance(self, current: Square, last_distance=0):
+        current.distance_from_end = last_distance
+
+        last_distance += 1
+
+        for n in self.get_all_neighbors(current):
+            if n.distance_from_end == -1 or n.distance_from_end > last_distance:
+                self.map_distance(n, last_distance)
+
     def walk(self, current: Square, visited: Optional[Set[Square]] = None):
         if visited is None:
             visited = set()
-        
+
         xxx = copy.deepcopy(visited)
 
         if current.height == E:
-            if self.distance == -1:
-                self.distance = len(visited)
+            if self.distance_to_end == -1:
+                self.distance_to_end = len(visited)
             else:
-                if self.distance > len(visited):
-                    self.distance = len(visited)
+                if self.distance_to_end > len(visited):
+                    self.distance_to_end = len(visited)
             return
 
         xxx.add(current)
@@ -89,11 +99,13 @@ class Grid:
                 if n.height - current.height == 1 or n.height == current.height:
                     self.walk(n, xxx)
 
+
 S = 0
 E = 27
 
 all_squares: List[List[Square]] = []
 starting_coords = (0, 0)
+end_coords = (0, 0)
 
 p = Path(__file__).with_name("input.txt")
 with p.open() as f:
@@ -107,6 +119,7 @@ with p.open() as f:
                 starting_coords = (row_number, col_number)
             elif char == "E":
                 height = E
+                end_coords = (row_number, col_number)
             s = Square(row_number, col_number, height)
             row.append(s)
 
@@ -114,9 +127,9 @@ with p.open() as f:
 
 grid = Grid(all_squares)
 
-print(grid)
-
 start = grid.get_square(starting_coords[0], starting_coords[1])
+end = grid.get_square(end_coords[0], end_coords[1])
+grid.map_distance(end)
 grid.walk(start)
 
-print(grid.distance)
+print(grid.distance_to_end)
