@@ -2,7 +2,7 @@ import copy
 from dataclasses import dataclass
 from pathlib import Path
 import sys
-from typing import List, Optional, Set, Tuple
+from typing import List, Tuple
 
 sys.setrecursionlimit(10000)
 
@@ -34,7 +34,7 @@ class Grid:
         self.start_coords = start_coords
         self.end_coords = end_coords
 
-    def __str__(self, visited: Set[Square] = set()) -> str:
+    def __str__(self) -> str:
         out = ""
 
         for row_number, _ in enumerate(self.grid):
@@ -44,12 +44,8 @@ class Grid:
                     out += "  E"
                 elif sq.row == start_coords[0] and sq.col == start_coords[1]:
                     out += "  S"
-                elif sq in visited:
-                    out += "  V"
                 else:
-                    out += str(sq.height).rjust(
-                        2, " "
-                    )
+                    out += str(sq.height).rjust(2, " ")
                 out += " "
             out += "\n"
 
@@ -121,6 +117,13 @@ grid.map_distance(end)
 print(start.distance_from_end)
 # 425
 
-least = min([sq.distance_from_end for row in grid.grid for sq in row if sq.height == 1 and sq.distance_from_end != -1])
+least = min(
+    [
+        sq.distance_from_end
+        for row in grid.grid
+        for sq in row
+        if sq.height == 1 and sq.distance_from_end != -1
+    ]
+)
 print(least)
 # 418
